@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: donkkaspapi/board-frontend:latest
+          image: donkkaspapi/board-frontend:arm64
+          imagePullPolicy: Always  
           ports:
             - containerPort: 80
 
