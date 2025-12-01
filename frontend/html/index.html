@@ -2,64 +2,458 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>게시판 프론트엔드</title>
+  <title>게시판</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #020617;
+      --card-bg: #020617;
+      --border: #1e293b;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.18);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans KR",
+        sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: var(--text-main);
+    }
+
+    .page {
+      min-height: 100vh;
+      padding: 32px 16px 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid var(--accent-soft);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--accent);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 18px;
+      padding: 18px 18px 20px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 22px 40px rgba(0, 0, 0, 0.85);
+    }
+
+    .card + .card {
+      margin-top: 10px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* form */
+
+    form div {
+      margin-bottom: 10px;
+    }
+
+    label {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+      resize: vertical;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.3);
+    }
+
+    textarea {
+      min-height: 120px;
+      font-family: inherit;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    /* buttons */
+
+    button {
+      font-family: inherit;
+      border: none;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 7px 13px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid transparent;
+      transition: background 0.15s ease, border-color 0.15s ease,
+        transform 0.05s ease, opacity 0.1s ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, #38bdf8, #22d3ee);
+      color: #0f172a;
+      border-color: transparent;
+    }
+
+    .btn.primary:hover {
+      filter: brightness(1.06);
+      transform: translateY(-1px);
+    }
+
+    .btn.outline {
+      border-color: #1f2937;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+    }
+
+    .btn.outline:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .btn.text {
+      padding-inline: 6px;
+      border-radius: 8px;
+      font-size: 11px;
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .btn.text:hover {
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .btn.danger {
+      color: #fecaca;
+    }
+
+    .btn.danger:hover {
+      background: rgba(248, 113, 113, 0.1);
+    }
+
+    /* table */
+
+    .table-wrapper {
+      border-radius: 14px;
+      border: 1px solid #111827;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead {
+      background: #020617;
+    }
+
+    th,
+    td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid #111827;
+      vertical-align: top;
+    }
+
+    th {
+      font-weight: 500;
+      color: var(--text-muted);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    tbody tr {
+      cursor: default;
+      transition: background 0.12s ease, transform 0.05s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(15, 23, 42, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .col-id {
+      width: 60px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .col-title {
+      font-weight: 500;
+    }
+
+    .col-content {
+      font-size: 12px;
+      color: var(--text-muted);
+      max-width: 260px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .col-actions {
+      width: 120px;
+      text-align: right;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 26px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .tag-up {
+      display: inline-flex;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      color: #6ee7b7;
+      background: rgba(6, 95, 70, 0.2);
+    }
+  </style>
 </head>
 <body>
-  <h1>게시판 프론트엔드</h1>
+  <div class="page">
+    <div class="shell">
+      <header>
+        <div>
+          <div class="badge">
+            <span>FastAPI · K3s · ArgoCD · Prometheus · Grafana</span>
+          </div>
+          <h1 class="title">게시판 데모 서비스</h1>
+          <p class="subtitle">
+            간단한 CRUD 게시판으로 클라우드 네이티브 CI/CD 및 모니터링 구성을 시연합니다.
+          </p>
+        </div>
+        <div>
+          <span class="tag-up">Demo</span>
+        </div>
+      </header>
 
-  <h2>글 작성</h2>
-  <form id="post-form">
-    <input type="hidden" id="post-id" />
-    <div>
-      <label>제목: <input type="text" id="title" required /></label>
-    </div>
-    <div>
-      <label>내용:</label><br />
-      <textarea id="content" rows="4" cols="40" required></textarea>
-    </div>
-    <button type="submit">저장</button>
-    <button type="button" id="cancel-edit" style="display:none;">수정 취소</button>
-  </form>
+      <div class="layout">
+        <!-- 글 작성 카드 -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">글 작성</div>
+              <p class="card-desc">
+                새 글을 등록하거나, 목록에서 선택한 글을 수정할 수 있습니다.
+              </p>
+            </div>
+          </div>
 
-  <h2>게시글 목록</h2>
-  <table border="1" cellpadding="4">
-    <thead>
-      <tr>
-        <th>ID</th><th>제목</th><th>내용</th><th>액션</th>
-      </tr>
-    </thead>
-    <tbody id="posts-body"></tbody>
-  </table>
+          <form id="post-form">
+            <input type="hidden" id="post-id" />
+
+            <div>
+              <label for="title">제목</label>
+              <input type="text" id="title" required placeholder="예) 쿠버네티스 실습 후기" />
+            </div>
+
+            <div>
+              <label for="content">내용</label>
+              <textarea
+                id="content"
+                rows="4"
+                cols="40"
+                required
+                placeholder="내용을 입력하세요."
+              ></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button
+                type="button"
+                id="cancel-edit"
+                class="btn outline"
+                style="display:none;"
+              >
+                수정 취소
+              </button>
+              <button type="submit" class="btn primary">저장</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- 목록 카드 -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">게시글 목록</div>
+              <p class="card-desc">
+                FastAPI 백엔드(<code>/posts</code>)에서 데이터를 가져와 표시합니다.
+              </p>
+            </div>
+            <button type="button" class="btn outline" onclick="fetchPosts()">
+              ⟳ 새로고침
+            </button>
+          </div>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="col-id">ID</th>
+                  <th>제목</th>
+                  <th>내용</th>
+                  <th class="col-actions">액션</th>
+                </tr>
+              </thead>
+              <tbody id="posts-body">
+                <tr>
+                  <td colspan="4" class="empty">게시글을 불러오는 중입니다…</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
 
   <script>
-    // 여기 주소: 백엔드 NodePort (VM IP + 30081)
+    // 백엔드 NodePort 주소
     const API_BASE = "http://192.168.64.12:30081";
 
     async function fetchPosts() {
-      const res = await fetch(`${API_BASE}/posts`);
-      const posts = await res.json();
-      const tbody = document.getElementById("posts-body");
-      tbody.innerHTML = "";
-      posts.forEach(p => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${p.id}</td>
-          <td>${p.title}</td>
-          <td>${p.content}</td>
-          <td>
-            <button onclick="editPost(${p.id})">수정</button>
-            <button onclick="deletePost(${p.id})">삭제</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
+      try {
+        const res = await fetch(`${API_BASE}/posts`);
+        if (!res.ok) throw new Error("목록을 불러오지 못했습니다.");
+        const posts = await res.json();
+        const tbody = document.getElementById("posts-body");
+        tbody.innerHTML = "";
+
+        if (!posts || posts.length === 0) {
+          const tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td colspan="4" class="empty">등록된 게시글이 없습니다.</td>';
+          tbody.appendChild(tr);
+          return;
+        }
+
+        posts.forEach((p) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="col-id">${p.id}</td>
+            <td class="col-title">${escapeHtml(p.title)}</td>
+            <td class="col-content">${escapeHtml(p.content)}</td>
+            <td class="col-actions">
+              <button class="btn text" onclick="editPost(${p.id})">수정</button>
+              <button class="btn text danger" onclick="deletePost(${p.id})">삭제</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) {
+        const tbody = document.getElementById("posts-body");
+        tbody.innerHTML = `<tr><td colspan="4" class="empty" style="color:#fecaca;">${e.message}</td></tr>`;
+      }
     }
 
     async function createPost(title, content) {
       await fetch(`${API_BASE}/posts`, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ title, content })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content }),
       });
       await fetchPosts();
     }
@@ -67,8 +461,8 @@
     async function updatePost(id, title, content) {
       await fetch(`${API_BASE}/posts/${id}`, {
         method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ title, content })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content }),
       });
       await fetchPosts();
     }
@@ -84,41 +478,55 @@
     async function editPost(id) {
       const res = await fetch(`${API_BASE}/posts`);
       const posts = await res.json();
-      const post = posts.find(p => p.id === id);
+      const post = posts.find((p) => p.id === id);
       if (!post) return;
 
       document.getElementById("post-id").value = post.id;
       document.getElementById("title").value = post.title;
       document.getElementById("content").value = post.content;
-      document.getElementById("cancel-edit").style.display = "inline-block";
+      document.getElementById("cancel-edit").style.display = "inline-flex";
     }
 
-    document.getElementById("cancel-edit").addEventListener("click", () => {
-      document.getElementById("post-id").value = "";
-      document.getElementById("title").value = "";
-      document.getElementById("content").value = "";
-      document.getElementById("cancel-edit").style.display = "none";
-    });
+    document
+      .getElementById("cancel-edit")
+      .addEventListener("click", () => {
+        document.getElementById("post-id").value = "";
+        document.getElementById("title").value = "";
+        document.getElementById("content").value = "";
+        document.getElementById("cancel-edit").style.display = "none";
+      });
 
-    document.getElementById("post-form").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const id = document.getElementById("post-id").value;
-      const title = document.getElementById("title").value;
-      const content = document.getElementById("content").value;
+    document
+      .getElementById("post-form")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("post-id").value;
+        const title = document.getElementById("title").value;
+        const content = document.getElementById("content").value;
 
-      if (id) {
-        await updatePost(id, title, content);
-      } else {
-        await createPost(title, content);
-      }
+        if (id) {
+          await updatePost(id, title, content);
+        } else {
+          await createPost(title, content);
+        }
 
-      document.getElementById("post-id").value = "";
-      document.getElementById("title").value = "";
-      document.getElementById("content").value = "";
-      document.getElementById("cancel-edit").style.display = "none";
-    });
+        document.getElementById("post-id").value = "";
+        document.getElementById("title").value = "";
+        document.getElementById("content").value = "";
+        document.getElementById("cancel-edit").style.display = "none";
+      });
 
-    // 페이지 로딩 시 최초 리스트 호출
+    // XSS 방지용 간단 escape
+    function escapeHtml(str) {
+      if (str == null) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // 초기 목록 로딩
     fetchPosts();
   </script>
 </body>
